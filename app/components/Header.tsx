@@ -1,25 +1,13 @@
 import Link from 'next/link';
 import client from '@/lib/contentful';
 import { Entry } from 'contentful';
+import { buildFullSlug } from '@/lib/page';
 
 interface MenuItem {
   id: string;
   slug: string;
   title: string;
   children?: MenuItem[];
-}
-
-async function buildSlugPath(page: Entry): Promise<string> {
-  const fields = page.fields as Record<string, unknown>;
-  const slug = fields.slug as string || 'home';
-  const parentPage = fields.parentPage as Entry | undefined;
-
-  if (!parentPage || parentPage.sys.id === page.sys.id) {
-    return slug === 'home' ? '' : slug;
-  }
-
-  const parentSlugPath = await buildSlugPath(parentPage);
-  return parentSlugPath ? `${parentSlugPath}/${slug}` : slug;
 }
 
 async function getAllPages(): Promise<MenuItem[]> {
@@ -35,7 +23,7 @@ async function getAllPages(): Promise<MenuItem[]> {
   for (const item of entries.items as Entry[]) {
     const fields = item.fields as Record<string, unknown>;
     const title = fields.title as string || 'Sem título';
-    const slugPath = await buildSlugPath(item);
+    const slugPath = await buildFullSlug(item);
 
     pagesMap.set(item.sys.id, { id: item.sys.id, slug: slugPath, title });
 

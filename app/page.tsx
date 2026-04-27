@@ -1,19 +1,9 @@
-import client from '@/lib/contentful';
 import { Entry } from 'contentful';
 import { ContentRenderer } from './components/ContentRenderer';
-
-async function getHomePage() {
-  const entries = await client.getEntries({
-    content_type: 'page',
-    'fields.slug': 'home',
-    limit: 1,
-  });
-
-  return entries.items[0] || null;
-}
+import { getPageByFullSlug } from '@/lib/page';
 
 export default async function Home() {
-  const page = await getHomePage();
+  const page = await getPageByFullSlug('');
 
   if (!page) {
     return (
